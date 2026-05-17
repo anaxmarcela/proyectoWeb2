@@ -36,10 +36,10 @@ function FormularioItem({onAgregar}) {
 
     return(
         <div>
-            <form>
+            <form onSubmit={guardarItem}>
                 <label>Nombre: <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre" type="text" name="nombre" required /></label><br />
                 <label>Categoría: <select value={categoriaId} onChange={e => setCategoriaId(e.target.value)}>
-                    {CATEGORIAS.map(categoria => <option value={categoria.id}>{categoria.nombre}</option>)}
+                    {CATEGORIAS.map(categoria => <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>)}
                 </select></label><br />
                 <label>Tipo: <select value={tipo} onChange={e => setTipo(e.target.value)}>
                     <option value="serie">Serie</option>
