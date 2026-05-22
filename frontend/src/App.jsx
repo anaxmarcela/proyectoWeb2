@@ -1,45 +1,73 @@
 import { useState, useEffect } from 'react'
+import { StorageContext } from './context/StorageProvider'
+import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 
 function App() {
-  const [items, setItems] = useState(() => {
-  return JSON.parse(localStorage.getItem('items') || '[]')
-  })
+  const { items, modo, setModo, guardarItem, eliminarItem, obtenerItems } = useContext(StorageContext)
+  const { tema, toggleTema } = useContext(ThemeContext)
+
+  const { items, modo, setModo, guardarItem, eliminarItem, obtenerItems } = useContext(StorageContext)
+  const { tema, toggleTema } = useContext(ThemeContext)
+
+  const inputRef = useRef(null)
+
+  const intervalRef = useRef(null)
+
   useEffect(() => {
-    localStorage.setItem(
-      'items',
-      JSON.stringify(items)
-    );
-  },[items]);
+    if (modo === 'api') {
+      intervalRef.current = setInterval(() => {
+        obtenerItems()
+      }, 30000)
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+  }, [modo])
 
-  const agregarItem = (item) => {
-    setItems([...items, item]);
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault()
+        inputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
+
+  const agregarItem = async (item) => {
+    await guardarItem(item)
+    inputRef.current?.focus()
   }
 
-  const cambiarEstado = (id, nuevoEstado) => {
-    setItems(items.map(item =>
-      item.id === id
-        ? { ...item, estado: nuevoEstado, fechaActividad: new Date().toISOString() }
-        : item
-    ))
-  }
-
-  const archivarItem = (id) => {
-    setItems(items.map(item =>
-      item.id === id ? { ...item, activo: false } : item
-    ))
+  const cambiarEstado = async (id, nuevoEstado) => {
+    const item = items.find(i => i.id === id)
+    await guardarItem({ ...item, estado: nuevoEstado, fechaActividad: new Date().toISOString() })
   }
 
   return (
     <div>
-      <h1>Mi Lista de Series y Películas</h1>
-      <FormularioItem onAgregar={agregarItem} />
-      <ListaItems items={items} onCambiarEstado={cambiarEstado} onArchivar={archivarItem} />
+      <header>
+        <h1>Mi Lista de Series y Películas</h1>
+        <div>
+          <button onClick={toggleTema}>
+            {tema === 'claro' ? '🌙 Oscuro' : '☀️ Claro'}
+          </button>
+          <label>
+            Modo:
+            <select value={modo} onChange={e => setModo(e.target.value)}>
+              <option value="local">Local</option>
+              <option value="api">API</option>
+            </select>
+          </label>
+        </div>
+      </header>
+      <FormularioItem onAgregar={agregarItem} inputRef={inputRef}/>
+      <ListaItems items={items} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
     </div>
   )
-
-  
 
 }
 export default App

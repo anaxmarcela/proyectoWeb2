@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CATEGORIAS } from '../utils/categorias'
 
-function FormularioItem({onAgregar}) {
+function FormularioItem({onAgregar, inputRef}) {
     const [nombre, setNombre] = useState("")
     const [categoriaId, setCategoriaId] = useState("")
     const [tipo, setTipo] = useState("serie")
@@ -37,7 +37,7 @@ function FormularioItem({onAgregar}) {
     return(
         <div>
             <form onSubmit={guardarItem}>
-                <label>Nombre: <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre" type="text" name="nombre" required /></label><br />
+                <label>Nombre: <input ref={inputRef} value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Nombre" type="text" name="nombre" required /></label><br />
                 <label>Categoría: <select value={categoriaId} onChange={e => setCategoriaId(e.target.value)}>
                     {CATEGORIAS.map(categoria => <option key={categoria.id} value={categoria.id}>{categoria.nombre}</option>)}
                 </select></label><br />
