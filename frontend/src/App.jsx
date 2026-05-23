@@ -51,28 +51,27 @@ function App() {
   
   return (
     <div>
-      <header>
+      <div className="header">
         <h1>Mi Lista de Series y Películas</h1>
-        <div className="header-controles">
-          <button onClick={toggleTema}>
-            {tema === 'claro' ? '🌙 Oscuro' : '☀️ Claro'}
+        <div className="top-controls">
+          <button className="mode-btn" onClick={toggleTema}>
+            {tema === 'oscuro' ? '☀️ Claro' : '🌙 Oscuro'}
           </button>
-          <label className="label-modo">
-            Modo:
-            <select value={modo} onChange={e => setModo(e.target.value)}>
-              <option value="local">Local</option>
-              <option value="api">API</option>
-            </select>
-          </label>
+          <select value={modo} onChange={e => setModo(e.target.value)}>
+            <option value="local">Local</option>
+            <option value="api">API</option>
+          </select>
         </div>
-      </header>
-      <main>
-        <button className="btn-agregar" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
-          {mostrarFormulario ? '✕ Cerrar' : '＋ Agregar'}
-        </button>
-        {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
-        <ListaItems items={items} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
-      </main>
+      </div>
+
+      <div className="separator" />
+
+      <button className="add-btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
+        {mostrarFormulario ? '✕ Cerrar' : '＋ Agregar'}
+      </button>
+
+      {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
+      <ListaItems items={items} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
     </div>
   )
 
