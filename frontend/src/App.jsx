@@ -53,11 +53,11 @@ function App() {
     <div>
       <header>
         <h1>Mi Lista de Series y Películas</h1>
-        <div>
+        <div className="header-controles">
           <button onClick={toggleTema}>
             {tema === 'claro' ? '🌙 Oscuro' : '☀️ Claro'}
           </button>
-          <label>
+          <label className="label-modo">
             Modo:
             <select value={modo} onChange={e => setModo(e.target.value)}>
               <option value="local">Local</option>
@@ -67,7 +67,7 @@ function App() {
         </div>
       </header>
       <main>
-        <button onClick={() => setMostrarFormulario(!mostrarFormulario)}>
+        <button className="btn-agregar" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
           {mostrarFormulario ? '✕ Cerrar' : '＋ Agregar'}
         </button>
         {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}

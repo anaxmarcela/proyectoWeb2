@@ -9,7 +9,8 @@ function ListaItems({ items, onCambiarEstado, onArchivar }) {
 
   return (
     <div>
-      <h2>Mi Lista ({activos.length})</h2>
+      <p className="lista-titulo">Mi Lista ({activos.length})</p>
+      <div className="lista-grid">
       {activos.map(item => (
         <ItemCard
           key={item.id}
@@ -18,6 +19,7 @@ function ListaItems({ items, onCambiarEstado, onArchivar }) {
           onArchivar={onArchivar}
         />
       ))}
+      </div>
     </div>
   )
 }
