@@ -13,7 +13,7 @@ function ItemCard({ item, onCambiarEstado, onArchivar }) {
   const categoria = getCategoriaById(item.categoriaId)
 
   return (
-    <div className="card" style={{ borderTopColor: categoria?.color || '#814881' }}>
+    <div className="card" style={{ borderTopColor: categoria?.color || 'var(--plum)' }}>
       <h2>{item.nombre}</h2>
 
       <div className="card-info">
@@ -25,7 +25,7 @@ function ItemCard({ item, onCambiarEstado, onArchivar }) {
         <span className="chip">{item.atributos.tipo}</span>
       </div>
 
-      <p className="platform">📺 {item.atributos.plataforma}</p>
+      <p className="platform">{item.atributos.plataforma}</p>
 
       <span className={`status ${STATUS_CLASS[item.estado] || 'pending'}`}>
         {item.estado}
