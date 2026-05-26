@@ -20,7 +20,6 @@ function StorageProvider({ children }) {
   }
 
   const obtenerItems = async (modoActual = modo) => {
-    setCargando(true)
     if (modoActual === 'api') {
       try {
         const res = await fetch('http://localhost:3000/api/items')
@@ -42,19 +41,21 @@ function StorageProvider({ children }) {
   const guardarItem = async (item) => {
     if (modo === 'api') {
       const existe = items.find(i => i.id === item.id)
-      if (existe) {
-        await fetch(`http://localhost:3000/api/items/${item.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(item)
-        })
-      } else {
-        await fetch('http://localhost:3000/api/items', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(item)
-        })
-      }
+      // actualiza el estado local inmediatamente para que la UI responda al instante
+      setItems(prev =>
+        existe
+          ? prev.map(i => i.id === item.id ? item : i)
+          : [...prev, item]
+      )
+      // envía al servidor en segundo plano sin bloquear la UI
+      fetch(`http://localhost:3000/api/items${existe ? '/' + item.id : ''}`, {
+        method: existe ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item)
+      }).catch(err => {
+        console.error('Error al guardar en la API:', err)
+        obtenerItems() // si falla, sincroniza desde el servidor
+      })
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       const existe = todos.find(i => i.id === item.id)
@@ -64,19 +65,26 @@ function StorageProvider({ children }) {
       } else {
         localStorage.setItem('items', JSON.stringify([...todos, item]))
       }
+      await obtenerItems()
     }
-    await obtenerItems()
   }
 
   const eliminarItem = async (id) => {
     if (modo === 'api') {
-      await fetch(`http://localhost:3000/api/items/${id}`, { method: 'DELETE' })
+      // elimina de la UI inmediatamente
+      setItems(prev => prev.filter(i => i.id !== id))
+      // envía al servidor en segundo plano
+      fetch(`http://localhost:3000/api/items/${id}`, { method: 'DELETE' })
+        .catch(err => {
+          console.error('Error al archivar en la API:', err)
+          obtenerItems() // si falla, sincroniza desde el servidor
+        })
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       const nuevos = todos.map(i => i.id === id ? { ...i, activo: false } : i)
       localStorage.setItem('items', JSON.stringify(nuevos))
+      await obtenerItems()
     }
-    await obtenerItems()
   }
 
   useEffect(() => {
