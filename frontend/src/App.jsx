@@ -5,7 +5,7 @@ import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 
 function App() {
-  const { items, modo, setModo, guardarItem, eliminarItem, obtenerItems } = useContext(StorageContext)
+  const { items, modo, setModo, cargando, guardarItem, eliminarItem, obtenerItems } = useContext(StorageContext)
   const { tema, toggleTema } = useContext(ThemeContext)
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -71,7 +71,7 @@ function App() {
       </button>
 
       {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
-      <ListaItems items={items} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
+      <ListaItems items={items} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
     </div>
   )
 

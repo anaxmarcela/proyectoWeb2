@@ -5,6 +5,7 @@ export const StorageContext = createContext()
 function StorageProvider({ children }) {
   const [modo, setModoState] = useState(() => localStorage.getItem('modo') || 'local')
   const [items, setItems] = useState([])
+  const [cargando, setCargando] = useState(true)
 
   // useRef: guarda el modo actual de forma síncrona para evitar race conditions
   // cuando hay un fetch en vuelo y el usuario cambia de modo antes de que resuelva
@@ -14,28 +15,28 @@ function StorageProvider({ children }) {
     localStorage.setItem('modo', nuevoModo)
     modoRef.current = nuevoModo  // actualiza el ref ANTES del re-render
     setItems([])
+    setCargando(true)
     setModoState(nuevoModo)
   }
 
   const obtenerItems = async (modoActual = modo) => {
+    setCargando(true)
     if (modoActual === 'api') {
       try {
         const res = await fetch('http://localhost:3000/api/items')
         const data = await res.json()
         // solo actualiza si el modo no cambió mientras esperábamos la respuesta
         if (modoRef.current === 'api') setItems(data)
-        return data
       } catch (err) {
         console.error('Error al conectar con la API:', err)
         if (modoRef.current === 'api') setItems([])
-        return []
       }
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       const activos = todos.filter(i => i.activo)
       setItems(activos)
-      return activos
     }
+    setCargando(false)
   }
 
   const guardarItem = async (item) => {
@@ -83,7 +84,7 @@ function StorageProvider({ children }) {
   }, [modo])
 
   return (
-    <StorageContext.Provider value={{ modo, setModo, items, obtenerItems, guardarItem, eliminarItem }}>
+    <StorageContext.Provider value={{ modo, setModo, items, cargando, obtenerItems, guardarItem, eliminarItem }}>
       {children}
     </StorageContext.Provider>
   )

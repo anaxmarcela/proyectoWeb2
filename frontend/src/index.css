@@ -17,6 +17,15 @@
   --gradient: linear-gradient(135deg, #E77665, #D180C8, #814881);
 }
 
+/* ========= LIGHT MODE ========= */
+body[data-theme='claro'] {
+  --background: #FFF7E8;
+  --card-bg: #FFF8F4;
+  --text: #1F0822;
+  --text-soft: #6a556d;
+  --shadow: 0 8px 24px rgba(31, 8, 34, 0.08);
+}
+
 /* ========= DARK MODE ========= */
 body[data-theme='oscuro'] {
   --background: #140517;
@@ -381,6 +390,20 @@ select {
   padding: 60px 20px;
   color: var(--text-soft);
   font-size: 1rem;
+}
+
+/* ========= LOADING STATE ========= */
+.loading-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-soft);
+  font-size: 1rem;
+  animation: pulso 1.2s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
 }
 
 /* ========= RESPONSIVE ========= */
