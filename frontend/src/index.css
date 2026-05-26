@@ -57,6 +57,8 @@ body[data-theme='claro'] {
   --text-soft: #6a556d;
   --shadow: 0 8px 24px rgba(31, 8, 34, 0.08);
   --shadow-hover: 0 16px 35px rgba(31, 8, 34, 0.12);
+  --blob-mauve: rgba(209, 128, 200, 0.45);
+  --blob-terra: rgba(231, 118, 101, 0.35);
 }
 
 /* ========= DARK MODE ========= */
@@ -120,41 +122,56 @@ body::after {
 
 /* ========= HEADER ========= */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: relative;
+  text-align: center;
   margin-bottom: 35px;
 }
 
 .header h1 {
   font-family: 'Montserrat', sans-serif;
   font-size: 3rem;
-  color: var(--eerie-black);
+  color: var(--text);
   letter-spacing: -1px;
 }
 
 /* ========= TOP CONTROLS ========= */
 .top-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.mode-btn {
-  background: var(--terra-cotta);
-  border: none;
-  color: white;
-  padding: 12px 20px;
-  border-radius: 14px;
-  font-weight: 700;
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 999px;
+  padding: 5px;
+  gap: 4px;
   cursor: pointer;
-  transition: 0.25s ease;
   box-shadow: var(--shadow);
+  transition: 0.3s ease;
 }
 
-.mode-btn:hover {
-  transform: translateY(-2px);
-  background: var(--terra-cotta-dark);
+.toggle-option {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.2s ease, color 0.3s ease;
+  color: var(--text-soft);
+}
+
+.toggle-option.active {
+  background: var(--plum);
+  color: white;
+  transform: scale(1.05);
 }
 
 select {
@@ -292,7 +309,6 @@ select {
   transition: 0.3s ease;
   position: relative;
   overflow: hidden;
-  border-top-width: 4px;
 }
 
 .card:hover {
@@ -430,9 +446,14 @@ select {
   body { padding: 25px; }
 
   .header {
+    display: flex;
     flex-direction: column;
-    gap: 20px;
-    align-items: flex-start;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .top-controls {
+    position: static;
   }
 
   .header h1 { font-size: 2.2rem; }

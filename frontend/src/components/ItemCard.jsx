@@ -13,7 +13,7 @@ function ItemCard({ item, onCambiarEstado, onArchivar }) {
   const categoria = getCategoriaById(item.categoriaId)
 
   return (
-    <div className="card" style={{ borderTopColor: categoria?.color || 'var(--plum)' }}>
+    <div className="card" style={{ backgroundColor: `${categoria?.color || '#814881'}33` }}>
       <h2>{item.nombre}</h2>
 
       <div className="card-info">
