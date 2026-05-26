@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react'
+import { createContext, useState, useEffect, useRef } from 'react'
 
 export const StorageContext = createContext()
 
@@ -6,17 +6,30 @@ function StorageProvider({ children }) {
   const [modo, setModoState] = useState(() => localStorage.getItem('modo') || 'local')
   const [items, setItems] = useState([])
 
+  // useRef: guarda el modo actual de forma síncrona para evitar race conditions
+  // cuando hay un fetch en vuelo y el usuario cambia de modo antes de que resuelva
+  const modoRef = useRef(modo)
+
   const setModo = (nuevoModo) => {
     localStorage.setItem('modo', nuevoModo)
+    modoRef.current = nuevoModo  // actualiza el ref ANTES del re-render
+    setItems([])
     setModoState(nuevoModo)
   }
 
-  const obtenerItems = async () => {
-    if (modo === 'api') {
-      const res = await fetch('http://localhost:3000/api/items')
-      const data = await res.json()
-      setItems(data)
-      return data
+  const obtenerItems = async (modoActual = modo) => {
+    if (modoActual === 'api') {
+      try {
+        const res = await fetch('http://localhost:3000/api/items')
+        const data = await res.json()
+        // solo actualiza si el modo no cambió mientras esperábamos la respuesta
+        if (modoRef.current === 'api') setItems(data)
+        return data
+      } catch (err) {
+        console.error('Error al conectar con la API:', err)
+        if (modoRef.current === 'api') setItems([])
+        return []
+      }
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       const activos = todos.filter(i => i.activo)
@@ -66,7 +79,7 @@ function StorageProvider({ children }) {
   }
 
   useEffect(() => {
-    obtenerItems()
+    obtenerItems(modo)
   }, [modo])
 
   return (
