@@ -3,9 +3,18 @@ import { StorageContext } from './context/StorageProvider'
 import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
+import Filtros from './components/Filtros'
 
 function App() {
-  const { items, modo, setModo, cargando, guardarItem, eliminarItem } = useContext(StorageContext)
+  const { items, modo, setModo, cargando, guardarItem, eliminarItem,
+          filtroCategoria, filtroEstado, busqueda } = useContext(StorageContext)
+
+  const itemsFiltrados = items.filter(item => {
+    const porCategoria = filtroCategoria === 'todas' || item.categoriaId === filtroCategoria
+    const porEstado    = filtroEstado === 'todos'    || item.estado === filtroEstado
+    const porBusqueda  = item.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    return porCategoria && porEstado && porBusqueda
+  })
   const { tema, toggleTema } = useContext(ThemeContext)
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -82,7 +91,8 @@ function App() {
       </button>
 
       {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
-      <ListaItems items={items} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
+      <Filtros />
+      <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
     </div>
   )
 

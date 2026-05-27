@@ -303,6 +303,74 @@ select {
   transform: translateY(-2px);
 }
 
+/* ========= FILTROS ========= */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.filtro-busqueda {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filtro-busqueda:focus {
+  border-color: var(--plum);
+}
+
+.filtro-busqueda::placeholder {
+  color: var(--text-soft);
+}
+
+.filtros select {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filtros select:focus {
+  border-color: var(--plum);
+}
+
+.filtro-limpiar {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--terra-cotta);
+  background: transparent;
+  color: var(--terra-cotta);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.filtro-limpiar:hover {
+  background: var(--terra-cotta);
+  color: white;
+}
+
 /* ========= GRID ========= */
 .cards-container {
   display: grid;
