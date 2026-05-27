@@ -196,23 +196,24 @@ select {
 
 /* ========= ADD BUTTON ========= */
 .add-btn {
-  background: var(--terra-cotta);
-  color: white;
-  border: none;
-  padding: 14px 22px;
-  border-radius: 16px;
-  font-size: 1rem;
-  font-weight: 700;
+  background: transparent;
+  color: var(--terra-cotta);
+  border: 2.5px solid var(--terra-cotta);
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: 0.25s ease;
   margin-bottom: 20px;
-  box-shadow: var(--shadow);
-  font-family: 'Inter', sans-serif;
 }
 
 .add-btn:hover {
-  background: var(--terra-cotta-dark);
-  transform: translateY(-2px);
+  background: var(--terra-cotta);
+  color: white;
+  transform: translateY(-2px) scale(1.08);
 }
 
 /* ========= SECTION TITLE ========= */
@@ -332,39 +333,45 @@ select {
   color: var(--text);
 }
 
-/* ========= CARD INFO ========= */
-.card-info {
+/* ========= CARD META ========= */
+.card-meta {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.chip {
-  background: var(--chip-bg);
-  color: var(--plum);
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-/* ========= PLATFORM ========= */
-.platform {
+  gap: 6px;
   margin-bottom: 14px;
-  color: var(--text-soft);
+  font-size: 0.88rem;
   font-weight: 500;
-  font-size: 0.9rem;
+  color: var(--text-soft);
+}
+
+.meta-dot {
+  color: var(--text-soft);
+  opacity: 0.7;
+  font-size: 1.4rem;
+  line-height: 0.8;
 }
 
 /* ========= STATUS ========= */
 .status {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 7px 14px;
   border-radius: 999px;
   font-weight: 700;
   font-size: 0.85rem;
   margin-bottom: 16px;
+  text-transform: capitalize;
+}
+
+.status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
 }
 
 .status.watching  { background: var(--status-watching-bg);  color: var(--status-watching-text); }
@@ -400,13 +407,24 @@ select {
 }
 
 .change-btn {
-  background: var(--terra-cotta);
-  color: white;
+  background: white;
+  color: var(--eerie-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
 }
 
 .change-btn:hover {
-  background: var(--terra-cotta-dark);
+  background: var(--card-bg);
   transform: scale(1.02);
+}
+
+.archive-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
 }
 
 .archive-btn {
