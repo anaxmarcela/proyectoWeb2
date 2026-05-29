@@ -4,6 +4,7 @@ import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 import Filtros from './components/Filtros'
+import Graficas from './components/Graficas'
 
 function App() {
   const { items, modo, setModo, cargando, guardarItem, eliminarItem,
@@ -92,6 +93,7 @@ function App() {
 
       {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
       <Filtros />
+      <Graficas items={itemsFiltrados} />
       <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
     </div>
   )
