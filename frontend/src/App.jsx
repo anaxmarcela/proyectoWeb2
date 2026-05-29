@@ -5,25 +5,12 @@ import FormularioItem from './components/FormularioItem'
 import ListaItems from './components/ListaItems'
 
 function App() {
-  const { items, modo, setModo, cargando, guardarItem, eliminarItem, obtenerItems } = useContext(StorageContext)
+  const { items, modo, setModo, cargando, guardarItem, eliminarItem } = useContext(StorageContext)
   const { tema, toggleTema } = useContext(ThemeContext)
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
 
   const inputRef = useRef(null)
-
-  const intervalRef = useRef(null)
-
-  useEffect(() => {
-    if (modo === 'api') {
-      intervalRef.current = setInterval(() => {
-        obtenerItems()
-      }, 30000)
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [modo])
 
   useEffect(() => {
     const handler = (e) => {

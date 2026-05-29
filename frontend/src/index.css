@@ -76,6 +76,16 @@ body[data-theme='oscuro'] {
   --archive-bg: rgba(209, 128, 200, 0.12);
   --archive-bg-hover: rgba(209, 128, 200, 0.22);
   --archive-color: #f2d8ef;
+
+  /* Estados en modo oscuro */
+  --status-watching-bg: rgba(30, 90, 55, 0.35);
+  --status-watching-text: #72e0a0;
+  --status-pending-bg: rgba(110, 75, 0, 0.35);
+  --status-pending-text: #f5c84a;
+  --status-dropped-bg: rgba(110, 25, 25, 0.35);
+  --status-dropped-text: #f28b8b;
+  --status-finished-bg: rgba(25, 55, 120, 0.35);
+  --status-finished-text: #7eb8f7;
 }
 
 /* ========= RESET ========= */

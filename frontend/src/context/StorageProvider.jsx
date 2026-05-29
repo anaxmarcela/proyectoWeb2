@@ -10,6 +10,8 @@ function StorageProvider({ children }) {
   // useRef: guarda el modo actual de forma síncrona para evitar race conditions
   // cuando hay un fetch en vuelo y el usuario cambia de modo antes de que resuelva
   const modoRef = useRef(modo)
+  // useRef: guarda el ID del intervalo de polling para poder limpiarlo sin provocar re-render
+  const intervalRef = useRef(null)
 
   const setModo = (nuevoModo) => {
     localStorage.setItem('modo', nuevoModo)
@@ -32,7 +34,9 @@ function StorageProvider({ children }) {
       }
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
-      const activos = todos.filter(i => i.activo)
+      const activos = todos
+        .filter(i => i.activo)
+        .sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro))
       setItems(activos)
     }
     setCargando(false)
@@ -89,6 +93,13 @@ function StorageProvider({ children }) {
 
   useEffect(() => {
     obtenerItems(modo)
+    // polling cada 30s en modo API para mantener los datos sincronizados
+    if (modo === 'api') {
+      intervalRef.current = setInterval(() => obtenerItems(), 30000)
+    }
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [modo])
 
   return (
