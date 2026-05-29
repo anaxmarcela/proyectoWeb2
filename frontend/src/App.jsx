@@ -1,4 +1,4 @@
-import { useContext, useRef, useState, useEffect } from 'react'
+import { useContext, useRef, useState, useEffect, useMemo, useCallback } from 'react'
 import { StorageContext } from './context/StorageProvider'
 import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
@@ -10,12 +10,15 @@ function App() {
   const { items, modo, setModo, cargando, guardarItem, eliminarItem,
           filtroCategoria, filtroEstado, busqueda } = useContext(StorageContext)
 
-  const itemsFiltrados = items.filter(item => {
-    const porCategoria = filtroCategoria === 'todas' || item.categoriaId === filtroCategoria
-    const porEstado    = filtroEstado === 'todos'    || item.estado === filtroEstado
-    const porBusqueda  = item.nombre.toLowerCase().includes(busqueda.toLowerCase())
-    return porCategoria && porEstado && porBusqueda
-  })
+  const itemsFiltrados = useMemo(() =>
+    items.filter(item => {
+      const porCategoria = filtroCategoria === 'todas' || item.categoriaId === filtroCategoria
+      const porEstado    = filtroEstado === 'todos'    || item.estado === filtroEstado
+      const porBusqueda  = item.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      return porCategoria && porEstado && porBusqueda
+    }),
+    [items, filtroCategoria, filtroEstado, busqueda]
+  )
   const { tema, toggleTema } = useContext(ThemeContext)
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -39,12 +42,15 @@ function App() {
     setMostrarFormulario(false)
     inputRef.current?.focus()
   }
- 
 
-  const cambiarEstado = async (id, nuevoEstado) => {
+  const cambiarEstado = useCallback(async (id, nuevoEstado) => {
     const item = items.find(i => i.id === id)
     await guardarItem({ ...item, estado: nuevoEstado, fechaActividad: new Date().toISOString() })
-  }
+  }, [items, guardarItem])
+
+  const handleArchivar = useCallback((id) => {
+    eliminarItem(id)
+  }, [eliminarItem])
   
   return (
     <div>
@@ -94,7 +100,7 @@ function App() {
       {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
       <Filtros />
       <Graficas items={itemsFiltrados} />
-      <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={eliminarItem} />
+      <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={handleArchivar} />
     </div>
   )
 
