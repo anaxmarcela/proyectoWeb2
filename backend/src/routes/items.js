@@ -7,7 +7,19 @@ router.get('/', async (req, res) => {
     const resultado = await pool.query(
       'SELECT * FROM items WHERE activo = 1 ORDER BY fecharegistro DESC'
     )
-    res.json(resultado.rows)
+    const items = resultado.rows.map(row => ({
+      id: row.id,
+      nombre: row.nombre,
+      categoriaId: row.categoriaid,
+      estado: row.estado,
+      puntuacion: row.puntuacion,
+      fechaRegistro: row.fecharegistro,
+      fechaActividad: row.fechaactividad,
+      notas: row.notas,
+      atributos: typeof row.atributos === 'string' ? JSON.parse(row.atributos) : row.atributos,
+      activo: row.activo
+    }))
+    res.json(items)
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Error al obtener items' })
