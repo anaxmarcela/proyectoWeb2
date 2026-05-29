@@ -1,10 +1,11 @@
 import { createContext, useState, useEffect, useRef, useReducer } from 'react'
 import { itemsReducer, initialState } from '../reducers/itemsReducer'
+import useLocalStorage from '../hooks/useLocalStorage'
 
 export const StorageContext = createContext()
 
 function StorageProvider({ children }) {
-  const [modo, setModoState] = useState(() => localStorage.getItem('modo') || 'local')
+  const [modo, setModoRaw] = useLocalStorage('modo', 'local')
   const [cargando, setCargando] = useState(true)
   const [state, dispatch] = useReducer(itemsReducer, initialState)
 
@@ -15,11 +16,10 @@ function StorageProvider({ children }) {
   const intervalRef = useRef(null)
 
   const setModo = (nuevoModo) => {
-    localStorage.setItem('modo', nuevoModo)
     modoRef.current = nuevoModo  // actualiza el ref ANTES del re-render
     dispatch({ type: 'HIDRATAR', payload: [] })
     setCargando(true)
-    setModoState(nuevoModo)
+    setModoRaw(nuevoModo)  // useLocalStorage persiste automáticamente
   }
 
   const obtenerItems = async (modoActual = modo) => {
