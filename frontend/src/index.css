@@ -144,6 +144,26 @@ body::after {
   letter-spacing: -1px;
 }
 
+.header-titulo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.racha-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--terra-cotta);
+  background: rgba(231, 118, 101, 0.12);
+  border: 1px solid rgba(231, 118, 101, 0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
 /* ========= TOP CONTROLS ========= */
 .top-controls {
   position: absolute;
