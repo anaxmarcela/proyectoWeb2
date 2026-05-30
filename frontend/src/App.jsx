@@ -1,4 +1,6 @@
-import { useContext, useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import { useContext, useRef, useState, useMemo, useCallback } from 'react'
+import useAtajoTeclado from './hooks/useAtajoTeclado'
+import useRacha from './hooks/useRacha'
 import { StorageContext } from './context/StorageProvider'
 import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
@@ -19,23 +21,23 @@ function App() {
     }),
     [items, filtroCategoria, filtroEstado, busqueda]
   )
+
   const { tema, toggleTema } = useContext(ThemeContext)
+
+  const { racha, mensaje } = useRacha(items)
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
 
   const inputRef = useRef(null)
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.ctrlKey && e.key === 'n') {
-        e.preventDefault()
-        setMostrarFormulario(true)
-        setTimeout(() => inputRef.current?.focus(), 50)
-      } 
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
+  useAtajoTeclado('n', useCallback(() => {
+    setMostrarFormulario(true)
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }, []), { ctrl: true })
+
+  useAtajoTeclado('Escape', useCallback(() => {
+    setMostrarFormulario(false)
+  }, []))
 
   const agregarItem = async (item) => {
     await guardarItem(item)
@@ -51,11 +53,14 @@ function App() {
   const handleArchivar = useCallback((id) => {
     eliminarItem(id)
   }, [eliminarItem])
-  
+
   return (
     <div>
       <div className="header">
-        <h1>Moonwatch</h1>
+        <div className="header-titulo">
+          <h1>Moonwatch</h1>
+          {racha > 0 && <span className="racha-badge">{mensaje}</span>}
+        </div>
         <div className="top-controls">
           <div className="theme-toggle" onClick={toggleTema}>
             <span className={`toggle-option ${tema === 'claro' ? 'active' : ''}`}>
@@ -103,6 +108,6 @@ function App() {
       <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={handleArchivar} />
     </div>
   )
-
 }
+
 export default App
