@@ -36,11 +36,7 @@ function useRacha(items) {
     }
 
     let mensaje = ''
-    if (dias === 0) mensaje = 'Sin actividad hoy todavía'
-    else if (dias === 1) mensaje = '¡Empezando la racha!'
-    else if (dias < 5) mensaje = `¡${dias} días seguidos!`
-    else if (dias < 10) mensaje = `🔥 ${dias} días en racha`
-    else mensaje = `🔥🔥 ${dias} días — ¡imparable!`
+    mensaje = dias > 0 ? `${dias}` : ''
 
     return { racha: dias, mensaje }
   }, [items])

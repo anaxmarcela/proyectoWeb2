@@ -153,14 +153,21 @@ body::after {
 }
 
 .racha-badge {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
-  font-weight: 600;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 999px;
+  padding: 5px 10px 5px 8px;
   color: var(--terra-cotta);
-  background: rgba(231, 118, 101, 0.12);
-  border: 1px solid rgba(231, 118, 101, 0.3);
-  border-radius: 20px;
-  padding: 4px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: var(--shadow);
   white-space: nowrap;
 }
 
@@ -205,14 +212,23 @@ body::after {
 }
 
 select {
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 2px solid var(--select-border);
-  background: var(--select-bg);
+  height: 50px;
+  padding: 0 28px 0 14px;
+  border-radius: 999px;
+  border: 2px solid var(--card-border);
+  background: var(--card-bg);
   font-weight: 600;
+  font-size: 0.9rem;
   color: var(--select-color);
   outline: none;
   font-family: 'Inter', sans-serif;
+  box-shadow: var(--shadow);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23814881' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
 }
 
 /* ========= SEPARATOR ========= */
