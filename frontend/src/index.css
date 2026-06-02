@@ -231,6 +231,49 @@ select {
   cursor: pointer;
 }
 
+/* ========= SALUDO ========= */
+.saludo-bar {
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.saludo-texto {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  color: var(--text-soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.saludo-texto strong {
+  color: var(--text);
+}
+
+.saludo-input-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.saludo-input {
+  background: var(--card-bg);
+  border: 2px solid var(--input-border);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.saludo-input:focus {
+  border-color: var(--plum);
+}
+
 /* ========= SEPARATOR ========= */
 .separator {
   width: 100%;

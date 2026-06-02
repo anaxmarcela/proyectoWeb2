@@ -1,6 +1,7 @@
 import { useContext, useRef, useState, useMemo, useCallback } from 'react'
 import useAtajoTeclado from './hooks/useAtajoTeclado'
 import useRacha from './hooks/useRacha'
+import useSaludo from './hooks/useSaludo'
 import { StorageContext } from './context/StorageProvider'
 import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
@@ -25,6 +26,7 @@ function App() {
   const { tema, toggleTema } = useContext(ThemeContext)
 
   const { racha, mensaje } = useRacha(items)
+  const { nombre, setNombre, saludo } = useSaludo()
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
 
@@ -95,6 +97,29 @@ function App() {
       </div>
 
       <div className="separator" />
+
+      <div className="saludo-bar">
+        {nombre ? (
+          <p className="saludo-texto">
+            {saludo}, <strong>{nombre}</strong>
+          </p>
+        ) : (
+          <div className="saludo-input-group">
+            <p className="saludo-texto">¿Cómo te llamas?</p>
+            <input
+              className="saludo-input"
+              type="text"
+              placeholder="Escribe tu nombre..."
+              maxLength={30}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && e.target.value.trim()) {
+                  setNombre(e.target.value.trim())
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
 
       <button className="add-btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
         {mostrarFormulario
