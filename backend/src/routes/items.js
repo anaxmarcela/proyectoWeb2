@@ -26,6 +26,24 @@ router.get('/', async (req, res) => {
   }
 })
 
+// Devuelve todos los registros de actividad (para el historial y las gráficas)
+router.get('/registros/todos', async (req, res) => {
+  try {
+    const resultado = await pool.query('SELECT * FROM registros ORDER BY fecha DESC')
+    const registros = resultado.rows.map(row => ({
+      id: row.id,
+      itemId: row.itemid,
+      fecha: row.fecha,
+      valor: row.valor,
+      notas: row.notas
+    }))
+    res.json(registros)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Error al obtener registros' })
+  }
+})
+
 router.get('/:id', async (req, res) => {
   const { id } = req.params
   try {

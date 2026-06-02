@@ -28,7 +28,7 @@ const COLORES_ESTADO = {
   abandonada: '#E74C3C',
 }
 
-function Graficas({ items }) {
+function Graficas({ items, registros = [] }) {
 
   const actividadSemana = useMemo(() => {
     const hoy = new Date()
@@ -37,12 +37,12 @@ function Graficas({ items }) {
       fecha.setDate(hoy.getDate() - (6 - i))
       const fechaISO = fecha.toISOString().split('T')[0]
       const dia = fecha.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' })
-      const cantidad = items.filter(item =>
-        item.fechaActividad?.startsWith(fechaISO)
-      ).length
+      const cantidad = registros
+        .filter(r => r.fecha?.startsWith(fechaISO))
+        .reduce((sum, r) => sum + (r.valor || 0), 0)
       return { dia, cantidad }
     })
-  }, [items])
+  }, [registros])
 
   const distribucionCategorias = useMemo(() => {
     return CATEGORIAS
@@ -79,7 +79,7 @@ function Graficas({ items }) {
               <YAxis allowDecimals={false} tick={{ fontSize: 9, fontFamily: 'Inter, sans-serif' }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar dataKey="cantidad" name="Items con actividad" fill={COLOR_PRINCIPAL} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="cantidad" name="Episodios vistos" fill={COLOR_PRINCIPAL} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

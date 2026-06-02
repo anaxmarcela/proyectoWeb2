@@ -634,12 +634,14 @@ select {
 /* ========= ACTION BUTTONS ========= */
 .card-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: auto;
 }
 
 .card-buttons button {
-  flex: 1;
+  flex: 1 1 calc(50% - 6px);
+  min-width: 0;
   border: none;
   padding: 12px;
   border-radius: 14px;
@@ -679,6 +681,157 @@ select {
 .archive-btn:hover {
   background: var(--archive-bg-hover);
   transform: scale(1.02);
+}
+
+/* ========= REGISTRO ACTIVIDAD ========= */
+.registro-actividad {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.registro-input {
+  flex: 1;
+  background: var(--background);
+  border: 2px solid var(--input-border);
+  border-radius: 10px;
+  padding: 7px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.registro-input:focus {
+  border-color: var(--plum);
+}
+
+.registro-confirmar, .registro-cancelar {
+  border: none;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.registro-confirmar {
+  background: var(--plum);
+  color: white;
+}
+
+.registro-cancelar {
+  background: var(--archive-bg);
+  color: var(--archive-color);
+}
+
+.registro-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--card-bg);
+  color: var(--plum);
+  border: 2px solid var(--plum);
+}
+
+.registro-btn:hover {
+  background: var(--plum);
+  color: white;
+  transform: scale(1.02);
+}
+
+/* ========= ERROR BANNER ========= */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(231, 76, 60, 0.12);
+  border: 2px solid #E74C3C;
+  color: #E74C3C;
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.error-banner svg {
+  flex-shrink: 0;
+}
+
+/* ========= HISTORIAL ========= */
+.historial-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--card-bg);
+  color: var(--text-soft);
+  border: 2px solid var(--input-border);
+}
+
+.historial-btn:hover {
+  border-color: var(--plum);
+  color: var(--plum);
+  transform: scale(1.02);
+}
+
+.historial {
+  background: var(--background);
+  border: 2px solid var(--input-border);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.historial-total {
+  font-weight: 700;
+  color: var(--plum);
+  font-size: 0.9rem;
+  margin: 0 0 8px;
+}
+
+.historial-vacio {
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  margin: 0;
+  text-align: center;
+}
+
+.historial-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.historial-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--input-border);
+  font-size: 0.88rem;
+}
+
+.historial-item:last-child {
+  border-bottom: none;
+}
+
+.historial-fecha {
+  color: var(--text-soft);
+  text-transform: capitalize;
+}
+
+.historial-valor {
+  font-weight: 700;
+  color: var(--text-soft);
 }
 
 /* ========= EMPTY STATE ========= */
