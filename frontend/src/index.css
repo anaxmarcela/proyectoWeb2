@@ -228,7 +228,7 @@ select {
 
 /* ========= SECTION TITLE ========= */
 .section-title {
-  color: var(--plum);
+  color: var(--terra-cotta);
   font-weight: 800;
   margin-bottom: 20px;
   letter-spacing: 1px;
@@ -301,6 +301,133 @@ select {
 .formulario-card button[type='submit']:hover {
   background: var(--terra-cotta-dark);
   transform: translateY(-2px);
+}
+
+/* ========= FILTROS ========= */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.filtro-busqueda {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.filtro-busqueda:focus {
+  border-color: var(--plum);
+}
+
+.filtro-busqueda::placeholder {
+  color: var(--text-soft);
+}
+
+.filtros select {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid var(--input-border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.filtros select:focus {
+  border-color: var(--plum);
+}
+
+.filtro-limpiar {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 2px solid var(--terra-cotta);
+  background: transparent;
+  color: var(--terra-cotta);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+.filtro-limpiar:hover {
+  background: var(--terra-cotta);
+  color: white;
+}
+
+/* ========= GRÁFICAS ========= */
+.graficas-section {
+  margin-bottom: 40px;
+}
+
+.graficas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.grafica-card {
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px 16px;
+  border: 2px solid var(--card-border);
+  box-shadow: var(--shadow);
+}
+
+.grafica-titulo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.grafica-tooltip {
+  background: var(--card-bg);
+  border: 2px solid var(--card-border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  box-shadow: var(--shadow);
+}
+
+.grafica-tooltip-label {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 4px;
+}
+
+.grafica-tooltip-item {
+  font-size: 0.8rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.recharts-legend-item-text {
+  font-size: 0.78rem !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.grafica-vacia {
+  text-align: center;
+  padding: 60px 0;
+  color: var(--text-soft);
+  font-size: 0.9rem;
 }
 
 /* ========= GRID ========= */

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { getCategoriaById } from '../utils/categorias'
 
 const ESTADOS = ['pendiente', 'viendo', 'terminada', 'abandonada']
@@ -58,4 +59,4 @@ function ItemCard({ item, onCambiarEstado, onArchivar }) {
   )
 }
 
-export default ItemCard
+export default memo(ItemCard)
