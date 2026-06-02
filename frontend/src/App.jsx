@@ -1,4 +1,6 @@
-import { useContext, useRef, useState, useEffect, useMemo, useCallback } from 'react'
+import { useContext, useRef, useState, useMemo, useCallback } from 'react'
+import useAtajoTeclado from './hooks/useAtajoTeclado'
+import useRacha from './hooks/useRacha'
 import { StorageContext } from './context/StorageProvider'
 import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
@@ -19,23 +21,23 @@ function App() {
     }),
     [items, filtroCategoria, filtroEstado, busqueda]
   )
+
   const { tema, toggleTema } = useContext(ThemeContext)
+
+  const { racha, mensaje } = useRacha(items)
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
 
   const inputRef = useRef(null)
 
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.ctrlKey && e.key === 'n') {
-        e.preventDefault()
-        setMostrarFormulario(true)
-        setTimeout(() => inputRef.current?.focus(), 50)
-      } 
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
+  useAtajoTeclado('n', useCallback(() => {
+    setMostrarFormulario(true)
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }, []), { ctrl: true })
+
+  useAtajoTeclado('Escape', useCallback(() => {
+    setMostrarFormulario(false)
+  }, []))
 
   const agregarItem = async (item) => {
     await guardarItem(item)
@@ -51,10 +53,18 @@ function App() {
   const handleArchivar = useCallback((id) => {
     eliminarItem(id)
   }, [eliminarItem])
-  
+
   return (
     <div>
       <div className="header">
+        {racha > 0 && (
+          <div className="racha-badge">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2C8 6 6 10 8 14c-2-1-3-3-3-5-2 3-1 7 2 9a6 6 0 0 0 10-4c1-3-1-6-3-7 0 2-1 3-2 4-1-2-1-5 0-7z"/>
+            </svg>
+            <span>{mensaje}</span>
+          </div>
+        )}
         <h1>Moonwatch</h1>
         <div className="top-controls">
           <div className="theme-toggle" onClick={toggleTema}>
@@ -103,6 +113,6 @@ function App() {
       <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={handleArchivar} />
     </div>
   )
-
 }
+
 export default App

@@ -1,10 +1,14 @@
 import { createContext, useState, useEffect, useRef, useReducer } from 'react'
 import { itemsReducer, initialState } from '../reducers/itemsReducer'
+import useLocalStorage from '../hooks/useLocalStorage'
+import useFetch from '../hooks/useFetch'
 
 export const StorageContext = createContext()
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+
 function StorageProvider({ children }) {
-  const [modo, setModoState] = useState(() => localStorage.getItem('modo') || 'local')
+  const [modo, setModoRaw] = useLocalStorage('modo', 'local')
   const [cargando, setCargando] = useState(true)
   const [state, dispatch] = useReducer(itemsReducer, initialState)
 
@@ -14,33 +18,42 @@ function StorageProvider({ children }) {
   // useRef: guarda el ID del intervalo de polling para poder limpiarlo sin provocar re-render
   const intervalRef = useRef(null)
 
+  const [fetchUrl, setFetchUrl] = useState(null)
+  const { data: apiData, error: apiError } = useFetch(fetchUrl)
+
+  useEffect(() => {
+    if (apiData !== null && modoRef.current === 'api') {
+      dispatch({ type: 'HIDRATAR', payload: apiData })
+      setCargando(false)
+    }
+  }, [apiData])
+
+  useEffect(() => {
+    if (apiError && modoRef.current === 'api') {
+      console.error('Error al conectar con la API:', apiError)
+      dispatch({ type: 'HIDRATAR', payload: [] })
+      setCargando(false)
+    }
+  }, [apiError])
+
   const setModo = (nuevoModo) => {
-    localStorage.setItem('modo', nuevoModo)
     modoRef.current = nuevoModo  // actualiza el ref ANTES del re-render
     dispatch({ type: 'HIDRATAR', payload: [] })
     setCargando(true)
-    setModoState(nuevoModo)
+    setModoRaw(nuevoModo)  // useLocalStorage persiste automáticamente
   }
 
-  const obtenerItems = async (modoActual = modo) => {
+  const obtenerItems = (modoActual = modo) => {
     if (modoActual === 'api') {
-      try {
-        const res = await fetch('http://localhost:3000/api/items')
-        const data = await res.json()
-        // solo actualiza si el modo no cambió mientras esperábamos la respuesta
-        if (modoRef.current === 'api') dispatch({ type: 'HIDRATAR', payload: data })
-      } catch (err) {
-        console.error('Error al conectar con la API:', err)
-        if (modoRef.current === 'api') dispatch({ type: 'HIDRATAR', payload: [] })
-      }
+      setFetchUrl(`${API_BASE}/api/items?_=${Date.now()}`)
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       const activos = todos
         .filter(i => i.activo)
         .sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro))
       dispatch({ type: 'HIDRATAR', payload: activos })
+      setCargando(false)
     }
-    setCargando(false)
   }
 
   const guardarItem = async (item) => {
@@ -53,13 +66,13 @@ function StorageProvider({ children }) {
         dispatch({ type: 'AGREGAR', payload: item })
       }
       // envía al servidor en segundo plano sin bloquear la UI
-      fetch(`http://localhost:3000/api/items${existe ? '/' + item.id : ''}`, {
+      fetch(`${API_BASE}/api/items${existe ? '/' + item.id : ''}`, {
         method: existe ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(item)
       }).catch(err => {
         console.error('Error al guardar en la API:', err)
-        obtenerItems() // si falla, sincroniza desde el servidor
+        obtenerItems()
       })
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
@@ -69,24 +82,22 @@ function StorageProvider({ children }) {
       } else {
         localStorage.setItem('items', JSON.stringify([...todos, item]))
       }
-      await obtenerItems()
+      obtenerItems()
     }
   }
 
   const eliminarItem = async (id) => {
     if (modo === 'api') {
-      // elimina de la UI inmediatamente
       dispatch({ type: 'ELIMINAR', payload: id })
-      // envía al servidor en segundo plano
-      fetch(`http://localhost:3000/api/items/${id}`, { method: 'DELETE' })
+      fetch(`${API_BASE}/api/items/${id}`, { method: 'DELETE' })
         .catch(err => {
           console.error('Error al archivar en la API:', err)
-          obtenerItems() // si falla, sincroniza desde el servidor
+          obtenerItems()
         })
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       localStorage.setItem('items', JSON.stringify(todos.map(i => i.id === id ? { ...i, activo: false } : i)))
-      await obtenerItems()
+      obtenerItems()
     }
   }
 
