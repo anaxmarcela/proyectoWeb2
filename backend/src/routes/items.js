@@ -26,6 +26,30 @@ router.get('/', async (req, res) => {
   }
 })
 
+router.get('/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const resultado = await pool.query('SELECT * FROM items WHERE id=$1', [id])
+    if (resultado.rows.length === 0) return res.status(404).json({ error: 'Item no encontrado' })
+    const row = resultado.rows[0]
+    res.json({
+      id: row.id,
+      nombre: row.nombre,
+      categoriaId: row.categoriaid,
+      estado: row.estado,
+      puntuacion: row.puntuacion,
+      fechaRegistro: row.fecharegistro,
+      fechaActividad: row.fechaactividad,
+      notas: row.notas,
+      atributos: typeof row.atributos === 'string' ? JSON.parse(row.atributos) : row.atributos,
+      activo: row.activo
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Error al obtener item' })
+  }
+})
+
 router.post('/', async (req, res) => {
   const { id, nombre, categoriaId, estado, puntuacion, fechaRegistro, fechaActividad, notas, atributos } = req.body
   try {

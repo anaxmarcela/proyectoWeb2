@@ -339,6 +339,12 @@ select {
   transform: translateY(-2px);
 }
 
+.char-counter {
+  font-size: 0.72rem;
+  text-align: right;
+  transition: color 0.2s;
+}
+
 /* ========= FILTROS ========= */
 .filtros {
   display: flex;
@@ -483,6 +489,8 @@ select {
   transition: 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .card:hover {
@@ -552,6 +560,25 @@ select {
 .status.dropped   { background: var(--status-dropped-bg);   color: var(--status-dropped-text); }
 .status.finished  { background: var(--status-finished-bg);  color: var(--status-finished-text); }
 
+/* ========= PUNTUACION ========= */
+.card-status-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.puntuacion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-soft);
+  position: relative;
+  top: 3px;
+}
+
 /* ========= DESCRIPTION ========= */
 .description {
   color: var(--text-soft);
@@ -565,6 +592,7 @@ select {
 .card-buttons {
   display: flex;
   gap: 12px;
+  margin-top: auto;
 }
 
 .card-buttons button {

@@ -29,10 +29,19 @@ function ItemCard({ item, onCambiarEstado, onArchivar }) {
         {item.atributos.plataforma && <span>{item.atributos.plataforma}</span>}
       </p>
 
-      <span className={`status ${STATUS_CLASS[item.estado] || 'pending'}`}>
-        {item.estado}
-      </span>
-
+      <div className="card-status-row">
+        <span className={`status ${STATUS_CLASS[item.estado] || 'pending'}`}>
+          {item.estado}
+        </span>
+        {item.puntuacion !== null && item.puntuacion !== undefined && (
+          <span className="puntuacion-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+            {item.puntuacion}/10
+          </span>
+        )}
+      </div>
       {item.notas && <p className="description">"{item.notas}"</p>}
 
       <div className="card-buttons">
