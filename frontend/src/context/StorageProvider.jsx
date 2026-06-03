@@ -73,7 +73,7 @@ function StorageProvider({ children }) {
       const existe = state.lista.find(i => i.id === item.id)
       // actualiza el estado local inmediatamente para que la UI responda al instante
       if (existe) {
-        dispatch({ type: 'CAMBIAR_ESTADO', payload: { id: item.id, estado: item.estado, fechaActividad: item.fechaActividad } })
+        dispatch({ type: 'ACTUALIZAR', payload: item })
       } else {
         dispatch({ type: 'AGREGAR', payload: item })
       }

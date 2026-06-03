@@ -27,6 +27,15 @@ export function itemsReducer(state, action) {
         )
       }
 
+    // Reemplaza un item completo (edición de nombre, categoría, notas, puntuación, etc.)
+    case 'ACTUALIZAR':
+      return {
+        ...state,
+        lista: state.lista.map(item =>
+          item.id === action.payload.id ? action.payload : item
+        )
+      }
+
     // Actualiza el estado del item (pendiente, viendo, terminada, abandonada)
     case 'CAMBIAR_ESTADO':
       return {

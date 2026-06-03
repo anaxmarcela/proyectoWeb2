@@ -29,6 +29,7 @@ function App() {
   const { nombre, setNombre, saludo } = useSaludo()
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const [itemEditando, setItemEditando] = useState(null)
 
   const inputRef = useRef(null)
 
@@ -39,13 +40,27 @@ function App() {
 
   useAtajoTeclado('Escape', useCallback(() => {
     setMostrarFormulario(false)
+    setItemEditando(null)
   }, []))
 
   const agregarItem = async (item) => {
     await guardarItem(item)
     setMostrarFormulario(false)
+    setItemEditando(null)
     inputRef.current?.focus()
   }
+
+  const editarItem = useCallback((item) => {
+    setItemEditando(item)
+    setMostrarFormulario(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }, [])
+
+  const cerrarFormulario = useCallback(() => {
+    setMostrarFormulario(false)
+    setItemEditando(null)
+  }, [])
 
   const cambiarEstado = useCallback(async (id, nuevoEstado) => {
     const item = items.find(i => i.id === id)
@@ -134,7 +149,14 @@ function App() {
         )}
       </div>
 
-      <button className="add-btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
+      <button className="add-btn" onClick={() => {
+        if (mostrarFormulario) {
+          cerrarFormulario()
+        } else {
+          setItemEditando(null)
+          setMostrarFormulario(true)
+        }
+      }}>
         {mostrarFormulario
           ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -145,10 +167,18 @@ function App() {
         }
       </button>
 
-      {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
+      {mostrarFormulario && (
+        <FormularioItem
+          key={itemEditando?.id || 'nuevo'}
+          onAgregar={agregarItem}
+          inputRef={inputRef}
+          itemInicial={itemEditando}
+          onCancelar={cerrarFormulario}
+        />
+      )}
       <Filtros />
       <Graficas items={itemsFiltrados} registros={registros} />
-      <ListaItems items={itemsFiltrados} registros={registros} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={handleArchivar} onRegistrarActividad={handleRegistrarActividad} />
+      <ListaItems items={itemsFiltrados} registros={registros} cargando={cargando} onCambiarEstado={cambiarEstado} onEditar={editarItem} onArchivar={handleArchivar} onRegistrarActividad={handleRegistrarActividad} />
     </div>
   )
 }
