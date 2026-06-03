@@ -13,6 +13,7 @@ Aplicación web para llevar un registro personal de series y películas. Permite
 |----------|-----|
 | Frontend (Vercel) | https://proyecto-web2-tau.vercel.app/ |
 | Backend (Render) | https://moonwatch-api.onrender.com |
+| Video demo | https://drive.google.com/file/d/1UNvejOVFGnj3FJxXD9ysqPwkzFrvosdS/view?usp=drive_link |
 
 > El backend está en el plan gratuito de Render, por lo que la primera petición tras un rato de inactividad puede tardar hasta ~50 segundos en responder mientras el servicio "despierta".
 
