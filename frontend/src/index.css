@@ -382,6 +382,45 @@ select {
   transform: translateY(-2px);
 }
 
+.formulario-titulo {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.2rem;
+  color: var(--text);
+  margin: 0 0 18px;
+  text-align: center;
+}
+
+.formulario-acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.formulario-acciones button[type='submit'] {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+}
+
+.form-cancelar {
+  flex: 1;
+  padding: 13px;
+  font-size: 15px;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text-soft);
+  border: 2px solid var(--input-border);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: 0.2s ease;
+}
+
+.form-cancelar:hover {
+  border-color: var(--text-soft);
+  color: var(--text);
+}
+
 .char-counter {
   font-size: 0.72rem;
   text-align: right;
@@ -519,6 +558,7 @@ select {
 .cards-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  align-items: start;
   gap: 28px;
 }
 
@@ -554,6 +594,7 @@ select {
   font-family: 'Montserrat', sans-serif;
   font-size: 1.5rem;
   margin-bottom: 12px;
+  padding-right: 44px;
   color: var(--text);
 }
 
@@ -629,6 +670,12 @@ select {
   font-style: italic;
   margin-bottom: 20px;
   font-size: 0.9rem;
+  /* reserva siempre 3 líneas para que todas las cards midan igual al estar cerradas */
+  min-height: calc(1.7em * 3);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* ========= ACTION BUTTONS ========= */
@@ -649,7 +696,7 @@ select {
   cursor: pointer;
   transition: 0.25s ease;
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .change-btn {
@@ -681,6 +728,35 @@ select {
 .archive-btn:hover {
   background: var(--archive-bg-hover);
   transform: scale(1.02);
+}
+
+.edit-icon-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  background: rgba(255, 248, 244, 0.45);
+  color: var(--plum);
+  border: 2px solid var(--plum);
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+body[data-theme='oscuro'] .edit-icon-btn {
+  background: rgba(36, 16, 40, 0.4);
+}
+
+.edit-icon-btn:hover {
+  background: var(--plum);
+  color: white;
+  transform: scale(1.08);
 }
 
 /* ========= REGISTRO ACTIVIDAD ========= */
