@@ -7,10 +7,12 @@ import { CATEGORIAS } from '../utils/categorias'
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null
+  const visibles = payload.filter(entry => entry.value)
+  if (!visibles.length) return null
   return (
     <div className="grafica-tooltip">
       {label && <p className="grafica-tooltip-label">{label}</p>}
-      {payload.map((entry, i) => (
+      {visibles.map((entry, i) => (
         <p key={i} className="grafica-tooltip-item" style={{ color: entry.color || entry.fill }}>
           {entry.name}: <strong>{entry.value}</strong>
         </p>
@@ -20,6 +22,7 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 const COLOR_PRINCIPAL = '#E77665'
+const COLOR_SECUNDARIO = '#814881'
 
 const COLORES_ESTADO = {
   pendiente:  '#F39C12',
@@ -31,18 +34,27 @@ const COLORES_ESTADO = {
 function Graficas({ items, registros = [] }) {
 
   const actividadSemana = useMemo(() => {
+    const tipoPorItem = {}
+    items.forEach(i => { tipoPorItem[i.id] = i.atributos?.tipo })
+
     const hoy = new Date()
     return Array.from({ length: 7 }, (_, i) => {
       const fecha = new Date(hoy)
       fecha.setDate(hoy.getDate() - (6 - i))
       const fechaISO = fecha.toISOString().split('T')[0]
       const dia = fecha.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' })
-      const cantidad = registros
-        .filter(r => r.fecha?.startsWith(fechaISO))
-        .reduce((sum, r) => sum + (r.valor || 0), 0)
-      return { dia, cantidad }
+
+      let episodios = 0
+      let minutos = 0
+      registros.forEach(r => {
+        if (r.fecha?.startsWith(fechaISO)) {
+          if (tipoPorItem[r.itemId] === 'pelicula') minutos += (r.valor || 0)
+          else episodios += (r.valor || 0)
+        }
+      })
+      return { dia, episodios, minutos }
     })
-  }, [registros])
+  }, [items, registros])
 
   const distribucionCategorias = useMemo(() => {
     return CATEGORIAS
@@ -79,7 +91,8 @@ function Graficas({ items, registros = [] }) {
               <YAxis allowDecimals={false} tick={{ fontSize: 9, fontFamily: 'Inter, sans-serif' }} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Bar dataKey="cantidad" name="Episodios vistos" fill={COLOR_PRINCIPAL} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="episodios" name="Episodios vistos" fill={COLOR_PRINCIPAL} radius={[6, 6, 0, 0]} />
+              <Bar dataKey="minutos" name="Minutos vistos" fill={COLOR_SECUNDARIO} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

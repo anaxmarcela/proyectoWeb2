@@ -12,9 +12,12 @@ const STATUS_CLASS = {
 
 function ItemCard({ item, registros = [], onCambiarEstado, onEditar, onArchivar, onRegistrarActividad }) {
   const categoria = getCategoriaById(item.categoriaId)
-  const [episodios, setEpisodios] = useState('')
+  const [valorActividad, setValorActividad] = useState('')
   const [mostrarRegistro, setMostrarRegistro] = useState(false)
   const [mostrarHistorial, setMostrarHistorial] = useState(false)
+
+  const esPelicula = item.atributos?.tipo === 'pelicula'
+  const unidadCorta = esPelicula ? 'min' : 'ep'
 
   // ordena los registros de este item del más reciente al más antiguo
   const historial = useMemo(
@@ -22,15 +25,15 @@ function ItemCard({ item, registros = [], onCambiarEstado, onEditar, onArchivar,
     [registros]
   )
 
-  const totalEpisodios = useMemo(
+  const totalActividad = useMemo(
     () => historial.reduce((sum, r) => sum + (r.valor || 0), 0),
     [historial]
   )
 
   const handleRegistrar = () => {
-    if (!episodios || Number(episodios) < 1) return
-    onRegistrarActividad(item.id, Number(episodios))
-    setEpisodios('')
+    if (!valorActividad || Number(valorActividad) < 1) return
+    onRegistrarActividad(item.id, Number(valorActividad))
+    setValorActividad('')
     setMostrarRegistro(false)
   }
 
@@ -77,10 +80,10 @@ function ItemCard({ item, registros = [], onCambiarEstado, onEditar, onArchivar,
           <input
             type="number"
             min="1"
-            max="99"
-            value={episodios}
-            onChange={e => setEpisodios(e.target.value)}
-            placeholder="Episodios vistos hoy"
+            max={esPelicula ? 999 : 99}
+            value={valorActividad}
+            onChange={e => setValorActividad(e.target.value)}
+            placeholder={esPelicula ? 'Minutos vistos hoy' : 'Episodios vistos hoy'}
             className="registro-input"
             onKeyDown={e => e.key === 'Enter' && handleRegistrar()}
             autoFocus
@@ -96,14 +99,18 @@ function ItemCard({ item, registros = [], onCambiarEstado, onEditar, onArchivar,
             <p className="historial-vacio">Sin registros todavía.</p>
           ) : (
             <>
-              <p className="historial-total">Total: {totalEpisodios} episodio{totalEpisodios !== 1 ? 's' : ''}</p>
+              <p className="historial-total">
+                Total: {totalActividad} {esPelicula
+                  ? (totalActividad === 1 ? 'minuto' : 'minutos')
+                  : (totalActividad === 1 ? 'episodio' : 'episodios')}
+              </p>
               <ul className="historial-lista">
                 {historial.map(r => (
                   <li key={r.id} className="historial-item">
                     <span className="historial-fecha">
                       {new Date(r.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
                     </span>
-                    <span className="historial-valor">{r.valor} ep</span>
+                    <span className="historial-valor">{r.valor} {unidadCorta}</span>
                   </li>
                 ))}
               </ul>
