@@ -35,8 +35,7 @@ function useRacha(items) {
       }
     }
 
-    let mensaje = ''
-    mensaje = dias > 0 ? `${dias}` : ''
+    const mensaje = dias > 0 ? `${dias}` : ''
 
     return { racha: dias, mensaje }
   }, [items])

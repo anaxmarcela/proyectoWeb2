@@ -1,6 +1,6 @@
 import ItemCard from './ItemCard'
 
-function ListaItems({ items, cargando, onCambiarEstado, onArchivar }) {
+function ListaItems({ items, registros = [], cargando, onCambiarEstado, onEditar, onArchivar, onRegistrarActividad }) {
   const activos = items.filter(item => item.activo)
 
   if (cargando) {
@@ -19,8 +19,11 @@ function ListaItems({ items, cargando, onCambiarEstado, onArchivar }) {
           <ItemCard
             key={item.id}
             item={item}
+            registros={registros.filter(r => r.itemId === item.id)}
             onCambiarEstado={onCambiarEstado}
+            onEditar={onEditar}
             onArchivar={onArchivar}
+            onRegistrarActividad={onRegistrarActividad}
           />
         ))}
       </div>

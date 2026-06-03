@@ -10,6 +10,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 function StorageProvider({ children }) {
   const [modo, setModoRaw] = useLocalStorage('modo', 'local')
   const [cargando, setCargando] = useState(true)
+  const [errorConexion, setErrorConexion] = useState(false)
   const [state, dispatch] = useReducer(itemsReducer, initialState)
 
   // useRef: guarda el modo actual de forma síncrona para evitar race conditions
@@ -24,6 +25,7 @@ function StorageProvider({ children }) {
   useEffect(() => {
     if (apiData !== null && modoRef.current === 'api') {
       dispatch({ type: 'HIDRATAR', payload: apiData })
+      setErrorConexion(false)
       setCargando(false)
     }
   }, [apiData])
@@ -32,6 +34,7 @@ function StorageProvider({ children }) {
     if (apiError && modoRef.current === 'api') {
       console.error('Error al conectar con la API:', apiError)
       dispatch({ type: 'HIDRATAR', payload: [] })
+      setErrorConexion(true)
       setCargando(false)
     }
   }, [apiError])
@@ -39,6 +42,7 @@ function StorageProvider({ children }) {
   const setModo = (nuevoModo) => {
     modoRef.current = nuevoModo  // actualiza el ref ANTES del re-render
     dispatch({ type: 'HIDRATAR', payload: [] })
+    setErrorConexion(false)
     setCargando(true)
     setModoRaw(nuevoModo)  // useLocalStorage persiste automáticamente
   }
@@ -46,12 +50,20 @@ function StorageProvider({ children }) {
   const obtenerItems = (modoActual = modo) => {
     if (modoActual === 'api') {
       setFetchUrl(`${API_BASE}/api/items?_=${Date.now()}`)
+      // carga el historial de registros desde la API (la gráfica y el historial los necesitan)
+      fetch(`${API_BASE}/api/items/registros/todos?_=${Date.now()}`)
+        .then(res => res.ok ? res.json() : [])
+        .then(data => dispatch({ type: 'HIDRATAR_REGISTROS', payload: data }))
+        .catch(err => console.error('Error al obtener registros:', err))
     } else {
       const todos = JSON.parse(localStorage.getItem('items') || '[]')
       const activos = todos
         .filter(i => i.activo)
         .sort((a, b) => new Date(b.fechaRegistro) - new Date(a.fechaRegistro))
       dispatch({ type: 'HIDRATAR', payload: activos })
+      // carga registros de actividad desde localStorage
+      const registrosGuardados = JSON.parse(localStorage.getItem('registros') || '[]')
+      dispatch({ type: 'HIDRATAR_REGISTROS', payload: registrosGuardados })
       setCargando(false)
     }
   }
@@ -61,7 +73,7 @@ function StorageProvider({ children }) {
       const existe = state.lista.find(i => i.id === item.id)
       // actualiza el estado local inmediatamente para que la UI responda al instante
       if (existe) {
-        dispatch({ type: 'CAMBIAR_ESTADO', payload: { id: item.id, estado: item.estado, fechaActividad: item.fechaActividad } })
+        dispatch({ type: 'ACTUALIZAR', payload: item })
       } else {
         dispatch({ type: 'AGREGAR', payload: item })
       }
@@ -101,6 +113,33 @@ function StorageProvider({ children }) {
     }
   }
 
+  const registrarActividad = async (itemId, valor) => {
+    const fecha = new Date().toISOString()
+    const registro = {
+      id: crypto.randomUUID(),
+      itemId,
+      fecha,
+      valor,
+      notas: ''
+    }
+
+    // agrega el registro al estado y actualiza fechaActividad del item
+    dispatch({ type: 'REGISTRAR_ACTIVIDAD', payload: { itemId, registro } })
+    const item = state.lista.find(i => i.id === itemId)
+    if (item) guardarItem({ ...item, fechaActividad: fecha })
+
+    if (modo === 'api') {
+      fetch(`${API_BASE}/api/items/${itemId}/registro`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(registro)
+      }).catch(err => console.error('Error al registrar actividad:', err))
+    } else {
+      const guardados = JSON.parse(localStorage.getItem('registros') || '[]')
+      localStorage.setItem('registros', JSON.stringify([...guardados, registro]))
+    }
+  }
+
   useEffect(() => {
     obtenerItems(modo)
     // polling cada 30s en modo API para mantener los datos sincronizados
@@ -117,7 +156,9 @@ function StorageProvider({ children }) {
       modo, setModo,
       items: state.lista.filter(i => i.activo),
       cargando,
-      obtenerItems, guardarItem, eliminarItem,
+      errorConexion,
+      obtenerItems, guardarItem, eliminarItem, registrarActividad,
+      registros: state.registros,
       dispatch,
       filtroCategoria: state.filtroCategoria,
       filtroEstado:    state.filtroEstado,

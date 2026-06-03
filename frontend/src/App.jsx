@@ -1,6 +1,7 @@
 import { useContext, useRef, useState, useMemo, useCallback } from 'react'
 import useAtajoTeclado from './hooks/useAtajoTeclado'
 import useRacha from './hooks/useRacha'
+import useSaludo from './hooks/useSaludo'
 import { StorageContext } from './context/StorageProvider'
 import { ThemeContext } from './context/ThemeProvider'
 import FormularioItem from './components/FormularioItem'
@@ -9,8 +10,8 @@ import Filtros from './components/Filtros'
 import Graficas from './components/Graficas'
 
 function App() {
-  const { items, modo, setModo, cargando, guardarItem, eliminarItem,
-          filtroCategoria, filtroEstado, busqueda } = useContext(StorageContext)
+  const { items, modo, setModo, cargando, errorConexion, guardarItem, eliminarItem, registrarActividad,
+          registros, filtroCategoria, filtroEstado, busqueda } = useContext(StorageContext)
 
   const itemsFiltrados = useMemo(() =>
     items.filter(item => {
@@ -25,8 +26,10 @@ function App() {
   const { tema, toggleTema } = useContext(ThemeContext)
 
   const { racha, mensaje } = useRacha(items)
+  const { nombre, setNombre, saludo } = useSaludo()
 
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
+  const [itemEditando, setItemEditando] = useState(null)
 
   const inputRef = useRef(null)
 
@@ -37,13 +40,27 @@ function App() {
 
   useAtajoTeclado('Escape', useCallback(() => {
     setMostrarFormulario(false)
+    setItemEditando(null)
   }, []))
 
   const agregarItem = async (item) => {
     await guardarItem(item)
     setMostrarFormulario(false)
+    setItemEditando(null)
     inputRef.current?.focus()
   }
+
+  const editarItem = useCallback((item) => {
+    setItemEditando(item)
+    setMostrarFormulario(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => inputRef.current?.focus(), 50)
+  }, [])
+
+  const cerrarFormulario = useCallback(() => {
+    setMostrarFormulario(false)
+    setItemEditando(null)
+  }, [])
 
   const cambiarEstado = useCallback(async (id, nuevoEstado) => {
     const item = items.find(i => i.id === id)
@@ -53,6 +70,10 @@ function App() {
   const handleArchivar = useCallback((id) => {
     eliminarItem(id)
   }, [eliminarItem])
+
+  const handleRegistrarActividad = useCallback((id, valor) => {
+    registrarActividad(id, valor)
+  }, [registrarActividad])
 
   return (
     <div>
@@ -96,7 +117,46 @@ function App() {
 
       <div className="separator" />
 
-      <button className="add-btn" onClick={() => setMostrarFormulario(!mostrarFormulario)}>
+      {errorConexion && (
+        <div className="error-banner">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <span>No se pudo conectar con el servidor. Revisa tu conexión o cambia a modo Local.</span>
+        </div>
+      )}
+
+      <div className="saludo-bar">
+        {nombre ? (
+          <p className="saludo-texto">
+            {saludo}, <strong>{nombre}</strong>
+          </p>
+        ) : (
+          <div className="saludo-input-group">
+            <p className="saludo-texto">¿Cómo te llamas?</p>
+            <input
+              className="saludo-input"
+              type="text"
+              placeholder="Escribe tu nombre..."
+              maxLength={30}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && e.target.value.trim()) {
+                  setNombre(e.target.value.trim())
+                }
+              }}
+            />
+          </div>
+        )}
+      </div>
+
+      <button className="add-btn" onClick={() => {
+        if (mostrarFormulario) {
+          cerrarFormulario()
+        } else {
+          setItemEditando(null)
+          setMostrarFormulario(true)
+        }
+      }}>
         {mostrarFormulario
           ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -107,10 +167,18 @@ function App() {
         }
       </button>
 
-      {mostrarFormulario && <FormularioItem onAgregar={agregarItem} inputRef={inputRef} />}
+      {mostrarFormulario && (
+        <FormularioItem
+          key={itemEditando?.id || 'nuevo'}
+          onAgregar={agregarItem}
+          inputRef={inputRef}
+          itemInicial={itemEditando}
+          onCancelar={cerrarFormulario}
+        />
+      )}
       <Filtros />
-      <Graficas items={itemsFiltrados} />
-      <ListaItems items={itemsFiltrados} cargando={cargando} onCambiarEstado={cambiarEstado} onArchivar={handleArchivar} />
+      <Graficas items={itemsFiltrados} registros={registros} />
+      <ListaItems items={itemsFiltrados} registros={registros} cargando={cargando} onCambiarEstado={cambiarEstado} onEditar={editarItem} onArchivar={handleArchivar} onRegistrarActividad={handleRegistrarActividad} />
     </div>
   )
 }

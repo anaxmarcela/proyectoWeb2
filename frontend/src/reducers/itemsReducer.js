@@ -1,5 +1,6 @@
 export const initialState = {
   lista:           [],       // array de todos los items
+  registros:       [],       // array de todos los registros de actividad
   filtroCategoria: 'todas',  // id de categoría o 'todas'
   filtroEstado:    'todos',  // estado o 'todos'
   busqueda:        '',       // texto de búsqueda
@@ -23,6 +24,15 @@ export function itemsReducer(state, action) {
         ...state,
         lista: state.lista.map(item =>
           item.id === action.payload ? { ...item, activo: false } : item
+        )
+      }
+
+    // Reemplaza un item completo (edición de nombre, categoría, notas, puntuación, etc.)
+    case 'ACTUALIZAR':
+      return {
+        ...state,
+        lista: state.lista.map(item =>
+          item.id === action.payload.id ? action.payload : item
         )
       }
 
@@ -50,19 +60,13 @@ export function itemsReducer(state, action) {
         busqueda:        '',
       }
 
-    // Agrega un registro de actividad al historial de un item
+    // Carga inicial de registros (desde localStorage)
+    case 'HIDRATAR_REGISTROS':
+      return { ...state, registros: action.payload }
+
+    // Agrega un registro de actividad al array global de registros
     case 'REGISTRAR_ACTIVIDAD':
-      return {
-        ...state,
-        lista: state.lista.map(item =>
-          item.id === action.payload.itemId
-            ? {
-                ...item,
-                registros: [...(item.registros || []), action.payload.registro]
-              }
-            : item
-        )
-      }
+      return { ...state, registros: [...state.registros, action.payload.registro] }
 
     default:
       return state
