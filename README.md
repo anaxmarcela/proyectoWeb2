@@ -3,16 +3,49 @@
 Aplicación web para llevar un registro personal de series y películas. Permite agregar títulos, clasificarlos por categoría y plataforma, cambiar su estado de visualización y archivarlos cuando ya no se quieren ver.
 
 **Autor:** Marcela Ordoñez — Carnet 24993
+**Curso:** Sistemas y Tecnologías Web — Universidad del Valle de Guatemala
+
+---
+
+## 🔗 Despliegue
+
+| Servicio | URL |
+|----------|-----|
+| Frontend (Vercel) | https://proyecto-web2-tau.vercel.app/ |
+| Backend (Render) | https://moonwatch-api.onrender.com |
+
+> El backend está en el plan gratuito de Render, por lo que la primera petición tras un rato de inactividad puede tardar hasta ~50 segundos en responder mientras el servicio "despierta".
 
 ---
 
 ## ¿Qué puede hacer?
 
-- Agregar series y películas con nombre, categoría, plataforma y notas
-- Ver la lista de títulos activos
-- Cambiar el estado: `pendiente` → `viendo` → `terminada` → `abandonada`
-- Archivar títulos (soft delete, no se borran de la base de datos)
-- Los datos persisten en LocalStorage aunque se recargue la página
+- Agregar, **editar** y archivar series y películas (nombre, categoría, plataforma, puntuación y notas)
+- Ver la lista de títulos activos y cambiar su estado: `pendiente` → `viendo` → `terminada` → `abandonada`
+- Calificar cada título con una puntuación del 0 al 10
+- **Registrar actividad diaria** (episodios vistos en series, minutos en películas) y consultar el historial de cada título
+- **Filtrar** por categoría, por estado y buscar por nombre, con botón para limpiar filtros
+- **3 gráficas** de estadísticas (actividad de los últimos 7 días, distribución por categoría y por estado)
+- **Tema claro/oscuro** persistido, saludo dinámico según la hora y atajos de teclado
+- **Modo híbrido API / Local**: funciona conectado al backend o sin conexión usando LocalStorage
+
+---
+
+## Capturas de pantalla
+
+### Modo día
+
+| | |
+|---|---|
+| ![Modo día 1](assets/mododia1.png) | ![Modo día 2](assets/mododia2.png) |
+| ![Modo día 3](assets/mododia3.png) | ![Modo día 4](assets/mododia4.png) |
+
+### Modo noche
+
+| | |
+|---|---|
+| ![Modo noche 1](assets/modonoche1.png) | ![Modo noche 2](assets/modonoche2.png) |
+| ![Modo noche 3](assets/modonoche3.png) | ![Modo noche 4](assets/modonoche4.png) |
 
 ---
 
@@ -22,9 +55,11 @@ Aplicación web para llevar un registro personal de series y películas. Permite
 |------|------------|
 | Frontend | React 19 + Vite |
 | Estilos | CSS puro + Google Fonts |
-| Estado | useState, useEffect, useContext, useRef |
+| Gráficas | Recharts |
+| Estado | useState, useEffect, useContext, useReducer, useRef, useMemo, useCallback |
 | Backend | Node.js + Express |
 | Base de datos | Supabase (PostgreSQL) |
+| Deploy | Vercel (frontend) + Render (backend) |
 
 ---
 
@@ -35,22 +70,32 @@ proyectoWeb2/
 ├── frontend/
 │   └── src/
 │       ├── components/
-│       │   ├── FormularioItem.jsx   # Formulario para agregar series/películas
-│       │   ├── ItemCard.jsx         # Tarjeta individual con botones de acción
-│       │   └── ListaItems.jsx       # Lista de todos los items activos
+│       │   ├── FormularioItem.jsx   # Formulario para crear y editar series/películas
+│       │   ├── ItemCard.jsx         # Tarjeta individual con acciones e historial
+│       │   ├── ListaItems.jsx       # Lista de todos los items activos
+│       │   ├── Filtros.jsx          # Búsqueda y filtros por categoría/estado
+│       │   └── Graficas.jsx         # Las 3 gráficas de estadísticas (Recharts)
 │       ├── context/
 │       │   ├── StorageProvider.jsx  # Contexto híbrido: API ↔ LocalStorage
 │       │   └── ThemeProvider.jsx    # Contexto de tema claro/oscuro
+│       ├── hooks/
+│       │   ├── useLocalStorage.js   # Estado sincronizado con LocalStorage
+│       │   ├── useFetch.js          # Fetch con loading/error y cancelación
+│       │   ├── useAtajoTeclado.js   # Atajos de teclado con cleanup
+│       │   ├── useRacha.js          # Racha de días consecutivos de actividad
+│       │   └── useSaludo.js         # Nombre de usuario y saludo por hora
+│       ├── reducers/
+│       │   └── itemsReducer.js      # useReducer: items, registros y filtros
 │       ├── utils/
 │       │   └── categorias.js        # 10 categorías con color y emoji
 │       ├── App.jsx                  # Componente principal (consume ambos contextos)
-│       └── index.css               # Estilos globales con variables por tema
+│       └── index.css                # Estilos globales con variables por tema
 └── backend/
     └── src/
         ├── db/
         │   └── index.js             # Conexión a Supabase y creación de tablas
         ├── routes/
-        │   └── items.js             # 5 endpoints de la API
+        │   └── items.js             # Endpoints de la API
         └── index.js                 # Servidor Express
 ```
 
@@ -111,10 +156,12 @@ Base URL: `http://localhost:3000`
 | Método | Ruta | Descripción |
 |--------|------|-------------|
 | GET | `/api/items` | Devuelve todos los items activos |
+| GET | `/api/items/:id` | Devuelve un item específico |
 | POST | `/api/items` | Crea un nuevo item |
 | PUT | `/api/items/:id` | Actualiza un item existente |
 | DELETE | `/api/items/:id` | Archiva un item (activo = 0) |
 | POST | `/api/items/:id/registro` | Registra actividad diaria |
+| GET | `/api/items/registros/todos` | Devuelve todos los registros (para historial y gráficas) |
 
 ### Ejemplo — Crear item
 
@@ -158,7 +205,7 @@ Base URL: `http://localhost:3000`
 | id | TEXT | UUID |
 | itemid | TEXT | Referencia al item |
 | fecha | TEXT | Fecha del registro (ISO) |
-| valor | INTEGER | Episodios vistos ese día |
+| valor | INTEGER | Episodios (series) o minutos (películas) vistos ese día |
 | notas | TEXT | Campo libre |
 
 ---
@@ -176,7 +223,21 @@ accion, comedia, drama, terror, ciencia ficcion, animacion, documental, thriller
 | Fase 1 | useState + useEffect + Backend Express | ✅ Completada |
 | Fase 2 | useContext híbrido + useRef + Tema visual | ✅ Completada |
 | Fase 3 | useReducer + Gráficas Recharts | ✅ Completada |
-| Fase 4 | Custom hooks + Deploy + Video | 🔄 Pendiente |
+| Fase 4 | Custom hooks + Deploy + Video | ✅ Completada |
+
+---
+
+## Custom Hooks
+
+Toda la lógica reutilizable se extrajo en hooks propios dentro de `frontend/src/hooks/`:
+
+| Hook | Qué hace |
+|------|----------|
+| `useLocalStorage` | Sincroniza un estado con LocalStorage (lee el valor guardado al iniciar y lo persiste en cada cambio). |
+| `useFetch` | Hace `fetch` a una URL con manejo de `loading`/`error` y cancelación automática vía `AbortController`. |
+| `useAtajoTeclado` | Registra un atajo de teclado (con modificadores opcionales) y limpia el listener al desmontar. |
+| `useRacha` | Calcula la racha de días consecutivos con actividad a partir de las fechas de los items. |
+| `useSaludo` | Guarda el nombre del usuario y devuelve un saludo dinámico según la hora del día. |
 
 ---
 
@@ -198,9 +259,11 @@ Separé las acciones en dos grupos: las que modifican los datos (`HIDRATAR`, `AG
 
 Al principio la implementé cambiando solo el campo `estado`, pero luego me di cuenta que también necesitaba actualizar `fechaActividad` para que la gráfica de actividad de los últimos 7 días funcionara correctamente. El problema era que el reducer tiene que ser función pura (sin `Date.now()`), entonces no podía generar la fecha dentro del reducer. La solución fue pasar la fecha ya generada desde el componente en el `payload`: `{ id, estado, fechaActividad: new Date().toISOString() }`, y el reducer solo la asigna sin crearla.
 
-**3. Gráfica más compleja: Actividad últimos 7 días**
+**3. Gráfica más compleja: Actividad últimos 7 días con dos unidades**
 
-Esta gráfica transforma los datos de una manera que las otras dos no hacen. En vez de simplemente agrupar items por una propiedad que ya existe (como categoría o estado), genera un array de los últimos 7 días desde hoy usando `Array.from` y `Date`, y para cada día cuenta cuántos items tienen ese día en su `fechaActividad`. Esto requiere comparar fechas en formato ISO y generar las etiquetas de los días en español. Todo envuelto en `useMemo` para que no se recalcule en cada render, solo cuando cambia la lista filtrada.
+Esta gráfica fue la más complicada porque tuve que resolver un problema que las otras dos no tenían: las series y las películas no se miden igual. En las series registro episodios vistos y en las películas registro minutos, entonces si los sumaba en una sola barra el número no significaba nada (no tiene sentido sumar 3 episodios + 90 minutos).
+
+La solución fue separar la actividad en dos barras por día: una para los episodios (que vienen de las series) y otra para los minutos (que vienen de las películas). Para saber a qué grupo pertenece cada registro, primero armo un mapa de `itemId → tipo` recorriendo los items, y luego, al recorrer los registros de cada uno de los últimos 7 días, mando el `valor` a la barra de minutos si el item es película o a la de episodios si no. Genero los 7 días desde hoy con `Array.from` y `Date`, comparo las fechas en formato ISO y armo las etiquetas en español. Además personalicé el tooltip para que solo muestre la unidad que tiene datos ese día (si un día solo vi episodios, no aparece "Minutos vistos: 0"). Todo va dentro de `useMemo` para que solo se recalcule cuando cambian los items o los registros.
 
 ---
 
